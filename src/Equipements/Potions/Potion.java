@@ -26,6 +26,7 @@ public class Potion extends Equipment {
         this.potionType =EnumPotions.getRandom();
         this.equipementDesc = potionType.getDescription();
         this.equipementType = "potion";
+        this.equipementName = potionType.getName();
     }
 
     public EnumPotions getPotionType() {

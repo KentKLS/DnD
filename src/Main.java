@@ -12,6 +12,8 @@ public class Main {
     public static void main(String[] args) {
         // Instancie un objet GameLogic.Menu
         Menu menu = new Menu();
+        menu.getGame().setMenu(menu);
+
         System.out.println(EnumText.black_bcg.getColorValue()+ art.logo +EnumText.reset.getColorValue());
         System.out.println(EnumText.light_white.getColorValue() + EnumText.bold.getColorValue() + "WELCOME TO THE WORLD OF "+EnumText.light_green.getColorValue()+" DUNGEONS"+EnumText.light_white.getColorValue()+" AND"+EnumText.red.getColorValue() +" DRAGONS"+ EnumText.reset.getColorValue());
         menu.mainMenu();

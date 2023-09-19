@@ -6,6 +6,7 @@ import Characters.Mage.Mage;
 import Characters.Character;
 import Characters.Warrior.Warrior;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -13,6 +14,7 @@ import Enum.EnumText;
 import Equipements.Equipment;
 import Equipements.Potions.Potion;
 import Exceptions.CharOutOfBoundException;
+import GameLogic.Cases.*;
 
 public class Menu {
 
@@ -30,17 +32,22 @@ public class Menu {
     private final String YELLOWCHAR = EnumText.yellow.getColorValue();
     private final String BOLDCHAR = EnumText.bold.getColorValue();
     private Game game;
+
+    public Game getGame() {
+        return game;
+    }
+
     public Menu() {
         this.warriorsList = new ArrayList<>();
         this.magesList = new ArrayList<>();
-
+        this.game = new Game();
     }
+
 
     private final String[] defaultName = {"Daniel", "Damian", "Danny", "David", "Diego", "Dylan", "Derek", "Damien", "Dori", "Daniela", "DeAndre", "Doris", "Devonte", "Dave"};
     private final ArrayList<Mage> magesList;
     private final ArrayList<Warrior> warriorsList;
     private Scanner scn = new Scanner(System.in);
-
 
 
     public void createDefaultChar() {
@@ -74,11 +81,6 @@ public class Menu {
         System.out.println(CYANCHAR + "\n Mage " + LIGHTPURPLECHAR + mage.getName() + LIGHTGREENCHAR + " created with success \n " + RESETCHARMODS);
         CharCreationMenu();
     }
-
-    /**
-     *
-     */
-
 
     public void mainMenu() {
         int answer = getIntAnswer(LIGHTYELLOWCHAR + "Choose your next action wisely" + YTCHAR + "\n 1.Create A new Character \n 2.Display already created Characters\n 3.Start a new game " + RESETCHARMODS + "\n 4.Exit the Game  ");
@@ -170,6 +172,14 @@ public class Menu {
         Warrior charToDel = this.warriorsList.get(index);
         deleteChar(charToDel, index);
         CharCreationMenu();
+    }
+
+    public ArrayList<Mage> getMagesList() {
+        return magesList;
+    }
+
+    public ArrayList<Warrior> getWarriorsList() {
+        return warriorsList;
     }
 
     public void deleteChar(Character character, int index) {
@@ -270,10 +280,10 @@ public class Menu {
                 charConfirmationMenu(playerChar);
             }
             case 3 -> {
-                game = new Game(playerChar);
-                game.populateGameBoard();
+                game.setPlayerCharacter(playerChar);
+                game.populateGameBoard(64);
                 game.setSpecificTableLength();
-                gameDiceThrowMenu();
+                firstCaseInteraction();
             }
             default -> {
                 System.out.println(EnumText.red + "Please choose 1 2 or 3");
@@ -384,17 +394,41 @@ public class Menu {
         }
     }
 
+    public void afterInteractionMenu() {
+        int answer = getIntAnswer("\n You don't see anything else in the room, you can: \n 1.Keep going \n 2.Check your character sheet \n 3.Quit the game (Careful this will shut the game completely and you won't be able to continue this adventure) ");
+        switch (answer) {
+            case 1 -> gameDiceThrowMenu();
+            case 2 -> {
+                System.out.println(game.playerCharacter.getDetails());
+                getStringAnswer("Press enter to go back to the last menu");
+                afterInteractionMenu();
+            }
+            case 3 -> System.exit(1);
+            default -> {
+                System.out.println(LIGHTREDCHAR + "Please type 1 2 or 3");
+                afterInteractionMenu();
+            }
+        }
+    }
+
+    public void firstCaseInteraction() {
+        System.out.println("You enter a dark gloomy tower, the air seems filled with magic, as you push the main door you feel like you are sucked into the void...\n");
+        game.caseInteraction();
+    }
+
     public void gameDiceThrowMenu() {
         System.out.println(YTCHAR + "\n\nNumber of turn played " + game.getTurnPlayed());
         System.out.println("You are currently on case " + game.getPlayerPos());
         getStringAnswer(LIGHTYELLOWCHAR + "\nPress enter to throw the dice and move forward");
         try {
             game.gameTurn();
-            gameDiceThrowMenu();
+            game.caseInteraction();
+            afterInteractionMenu();
         } catch (CharOutOfBoundException e) {
             System.out.println("Congrats you won");
             restartChoice();
         }
+
     }
 
     public void fleeOrFightMenu(Enemy enemy) {
@@ -407,7 +441,6 @@ public class Menu {
                 fleeOrFightMenu(enemy);
             }
         }
-
     }
 
     public void lootInteractionMenu(Equipment equipment) {
@@ -423,7 +456,7 @@ public class Menu {
         int answer = getIntAnswer("\n What would you like to do with it ? \n 1.Exchange it with my own equipment (Careful you can't go back on your choice) \n 2.Leave it here");
         switch (answer) {
             case 1 -> game.switchEquipment(equipment);
-            case 2 -> gameDiceThrowMenu();
+            case 2 -> afterInteractionMenu();
             default -> {
                 System.out.println("Please type 1 or 2");
                 equipmentInteractionMenu(equipment);
@@ -436,7 +469,7 @@ public class Menu {
         switch (answer) {
             case 1 -> game.drinkPot(potion);
 
-            case 2 -> gameDiceThrowMenu();
+            case 2 -> afterInteractionMenu();
 
             default -> {
                 System.out.println("Please type 1 or 2");
@@ -446,16 +479,25 @@ public class Menu {
     }
 
     public void restartChoice() {
-        int answer = getIntAnswer(YTCHAR + "\nWould you like to: \n 1.Go back to main menu \n 2.Go back to the start of your adventure \n 3.Quit the game");
+        int answer = getIntAnswer(YTCHAR + "\nWould you like to: \n 1.Go back to main menu \n 2.Quit the game");
         switch (answer) {
-            case 1 -> mainMenu();
-            case 2 -> startMenu();
-            case 3 -> {
+            case 1 -> {
+                initGame();
+                mainMenu();
+            }
+            case 2 -> {
+                System.exit(0);
             }
             default -> {
                 System.out.println(REDCHAR + "\n\nPlease type 1 2 or 3 \n\n" + RESETCHARMODS);
                 restartChoice();
             }
         }
+    }
+    public void initGame(){
+        this.game= new Game();
+        game.setMenu(this);
+        this.magesList.clear();
+        this.warriorsList.clear();
     }
 }
