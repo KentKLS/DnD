@@ -1,29 +1,20 @@
 package Characters.Warrior;
 
-import Characters.Personnage;
+import Characters.Character;
 import Equipements.Defense.Shield;
 import Enum.EnumType;
-import Equipements.Offense.EquipementOffensif;
 import Equipements.Offense.Weapon;
 
-public class Warrior extends Personnage {
+public class Warrior extends Character {
 
-    public Warrior(){
-        this.type = EnumType.warrior;
-        this.name = "Default Danny";
-        this.hp = 10;
-        this.ap= 10;
-        this.equipementOffensif= new Weapon();
-        this.equipementDefensif= new Shield();
-    }
-
-    public Warrior(String name){
+    public Warrior(String name) {
         this.type = EnumType.warrior;
         this.name = name;
         this.hp = 10;
-        this.ap= 10;
-        this.equipementOffensif= new Weapon();
-        this.equipementDefensif= new Shield();
+        this.ap = 10;
+        this.equipementOffensif = new Weapon("Basic Sword", 15);
+        this.equipementDefensif = new Shield("Wooden Shield", 15);
+
     }
 
 }

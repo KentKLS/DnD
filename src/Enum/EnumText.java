@@ -1,6 +1,8 @@
 package Enum;
 
 public enum EnumText {
+    bold ("\u001B[1m"),
+    unbold ("\\u001B[21m"),
     reset("\u001B[0m"),
     black("\u001B[30m"),
     red("\u001B[31m"),
@@ -28,14 +30,18 @@ public enum EnumText {
     blue_bcg("\u001B[44m"),
     purple_bcg("\u001B[45m");
 
-    String name;
+    private final String colorValue;
 
-    EnumText(String name) {
-        this.name = name;
+    public String getColorValue() {
+        return colorValue;
+    }
+
+    EnumText(String colorValue) {
+        this.colorValue = colorValue;
 
     }
     @Override
     public String toString() {
-        return this.name;
+        return "Color is "+colorValue;
     }
 }
